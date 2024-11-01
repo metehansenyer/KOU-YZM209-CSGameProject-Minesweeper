@@ -1,0 +1,17 @@
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\bin\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.exe
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\bin\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.deps.json
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\bin\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.runtimeconfig.json
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\bin\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.dll
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\bin\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.pdb
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.csproj.GenerateResource.cache
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.AssemblyInfoInputs.cache
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.AssemblyInfo.cs
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.csproj.CoreCompileInputs.cache
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.dll
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\refint\KOU-YZM209-CSGameProject-Minesweeper.dll
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.pdb
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.genruntimeconfig.cache
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\ref\KOU-YZM209-CSGameProject-Minesweeper.dll
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU_YZM209_CSGameProject_Minesweeper.Window.resources
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU_YZM209_CSGameProject_Minesweeper.gameArea.resources
