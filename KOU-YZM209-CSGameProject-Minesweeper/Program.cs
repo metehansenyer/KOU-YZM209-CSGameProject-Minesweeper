@@ -15,8 +15,6 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
             Window inputScreen = new Window();
 
             Application.Run(inputScreen);
-
-            //if (inputScreen.Authentication_success) Application.Run(new gameArea());
         }
     }
 }

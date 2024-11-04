@@ -14,4 +14,4 @@ C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZ
 C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU-YZM209-CSGameProject-Minesweeper.genruntimeconfig.cache
 C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\ref\KOU-YZM209-CSGameProject-Minesweeper.dll
 C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU_YZM209_CSGameProject_Minesweeper.Window.resources
-C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU_YZM209_CSGameProject_Minesweeper.gameArea.resources
+C:\Users\metehansenyer\Desktop\Proje\KOU-YZM209-CSGameProject-Minesweeper\KOU-YZM209-CSGameProject-Minesweeper\obj\Debug\net8.0-windows\KOU_YZM209_CSGameProject_Minesweeper.ScoreboardWindow.resources

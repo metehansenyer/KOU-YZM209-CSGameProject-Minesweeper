@@ -1,154 +1,234 @@
-﻿using Microsoft.VisualBasic.Devices;
-using System;
+﻿using System;
 using System.Drawing;
+using System.Drawing.Text;
+using System.Windows.Forms;
 
 namespace KOU_YZM209_CSGameProject_Minesweeper
 {
     public class Game
     {
+        // Kullanıcı adı, grid boyutu ve mayın sayısı için sabit değişkenler
         private readonly string userName;
         private readonly int gridSize;
         private readonly int mineCount;
 
-        private int moveCount = 0;
-        private Window window;
+        private int cellSize; // Her hücrenin boyutu (bir kenarı)
+        private int moveCount = 0; // Yapılan hamle sayısı
+        private int score; // Kullanıcının skoru
+        private Window window; // Oyun penceresi için referans tutucu
+        private Scoreboard scoreboard; // Skor tablosu
 
-        private Button[,] grid;
-        bool[,] mineField;
-        private Label moves = new Label();
-        private Panel drawingPanel = new Panel();
+        private Button[,] grid; // Oyun alanının kendisi
+        bool[,] mineField; // Mayın tutucu
+        private Label moves = new Label(); // Hamle sayısını gösterecek yazı
+        private Label timerText = new Label(); // Zamanı gösterecek yazı
+        private Panel drawingPanel = new Panel(); // Oyun alanının çizileceği panel
 
-        public Game(string userName, int gridSize, int mineCount, Window window)
+        private System.Windows.Forms.Timer timer; // Zamanlayıcı
+        private int elapsedTime = 0; // Geçen zaman (sn)
+
+        // Oyun sınıfının yapıcı metodu
+        public Game(string userName, int gridSize, int mineCount, Window window, Scoreboard scoreboard)
         {
-            this.userName = userName;
-            this.gridSize = gridSize;
-            this.mineCount = mineCount;
-            this.window = window;
+            this.userName = userName; // Kullanıcı adını al
+            this.gridSize = gridSize; // Grid boyutunu ayarla
+            this.mineCount = mineCount; // Mayın sayısını ayarla
+            this.window = window; // Oyun penceresini ayarla
+            this.scoreboard = scoreboard; // Skor tablosunu ayarla
+
+            // Grid boyutuna göre hücre boyutunu ayarla
+            if (gridSize < 25)
+            {
+                cellSize = 30; // Küçük grid için hücre boyutu
+            }
+            else
+            {
+                cellSize = 20; // Büyük grid için hücre boyutu
+
+                // Panel fontunu küçült
+                Font currentFont = drawingPanel.Font;
+                float newFontSize = currentFont.Size * 0.8f;
+                drawingPanel.Font = new Font(currentFont.FontFamily, newFontSize, currentFont.Style);
+            }
         }
 
+        // Oyun başladığında çağrılan metod
         public void onGame()
         {
-            setWindowSize();
-            addMainObjects();
-            plantMines();
-            createGrid();
+            setWindowSize(); // Pencere boyutunu ayarla
+            addMainObjects(); // Ana nesneleri ekle
+            plantMines(); // Mayınları yerleştir
+            createGrid(); // Oyun alanını oluştur
+            setMineCountForOneCell(); // Her hücre için mayın sayısını ayarla
+            InitializeTimer(); // Zamanlayıcıyı başlat
+            timer.Start(); // Zamanlayıcıyı çalıştır
         }
 
+        // Zamanlayıcıyı başlatma metod
+        private void InitializeTimer()
+        {
+            timer = new System.Windows.Forms.Timer(); // Zamanlayıcı nesnesi oluştur
+            timer.Interval = 1000; // Her bir saniyede bir tetiklenecek
+            timer.Tick += Timer_Tick; // Zamanlayıcı tetiklendiğinde çağrılacak metod
+        }
+
+        // Zamanlayıcı tetiklendiğinde çağrılan metod
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            elapsedTime++; // Geçen zamanı artır
+            UpdateTimerText(); // Zamanı güncelle
+        }
+
+        // Zaman etiketini güncelleme metod
+        private void UpdateTimerText()
+        {
+            int minutes = elapsedTime / 60; // Dakikaları hesapla
+            int seconds = elapsedTime % 60; // Saniyeleri hesapla
+            timerText.Text = $"Geçen Süre:\r\n{minutes:D2}:{seconds:D2}"; // Zamanı yazdır
+        }
+
+        // Zamanlayıcıyı durdurma metod
+        private void StopTimer()
+        {
+            timer.Stop(); // Zamanlayıcıyı durdur
+        }
+
+        // Pencere boyutunu ayarlama metod
         private void setWindowSize()
         {
             int screenWidth, screenHeight;
 
-            screenWidth = gridSize * 30 + 150;
-            screenHeight = gridSize * 30 + 80;
+            screenWidth = gridSize * cellSize + 150; // Genişlik hesapla
+            screenHeight = gridSize * cellSize + 80; // Yükseklik hesapla
 
-            window.Size = new Size(screenWidth, screenHeight);
+            window.Size = new Size(screenWidth, screenHeight); // Pencere boyutunu ayarla
         }
 
+        // Ana nesneleri ekleme metod
         private void addMainObjects()
         {
+            // Bilgi kutusu için yazı oluştur
             Label infoBox = new Label();
             infoBox.AutoSize = true;
-            infoBox.Location = new Point((gridSize * 30 / 2) - 87, (gridSize * 30) + 5);
+            infoBox.Location = new Point((gridSize * cellSize / 2) - 87, (gridSize * cellSize) + 5);
             infoBox.Name = "infoText";
             infoBox.Size = new Size(344, 64);
             infoBox.TabIndex = 1;
             infoBox.Text = "Geliştirici: Metehan Şenyer\r\nOkul Numarası: 230229047\r\n";
 
+            // Skor tablosunu gösteren buton oluştur
             Button scorebordButton = new Button();
             scorebordButton.ForeColor = Color.Black;
-            scorebordButton.Location = new Point((gridSize * 30) + 15, 30);
+            scorebordButton.Location = new Point((gridSize * cellSize) + 15, 30);
             scorebordButton.Name = "scorebordButton";
             scorebordButton.Size = new Size(110, 30);
             scorebordButton.TabIndex = 2;
             scorebordButton.Text = "Skor Tablosu";
             scorebordButton.UseVisualStyleBackColor = true;
+            scorebordButton.Click += (sender, e) => ShowScoreboard(); // Butona tıklandığında skor tablosunu göster
 
+            // Hamle sayısını gösteren etiket
             moves.AutoSize = true;
-            moves.Location = new Point((gridSize * 30) + 17, 90);
+            moves.Location = new Point((gridSize * cellSize) + 17, 90);
             moves.Name = "movesText";
             moves.Size = new Size(203, 32);
             moves.TabIndex = 3;
-            moves.Text = $"Hamle Sayısı: {moveCount}";
+            moves.Text = $"Hamle Sayısı: {moveCount}"; // Başlangıçta hamle sayısı 0
 
+            // Zamanı gösterecek etiket
+            timerText.AutoSize = true;
+            timerText.Location = new Point((gridSize * cellSize) + 25, 120);
+            timerText.Name = "timerText";
+            timerText.Size = new Size(167, 64);
+            timerText.TabIndex = 4;
+            timerText.Text = $"Geçen Süre:\r\n{elapsedTime:D2}:{0:D2}"; // Başlangıçta zaman 00.00
+            timerText.TextAlign = ContentAlignment.MiddleCenter;
+
+            // Tüm nesneleri pencereye ekle
             window.Controls.Add(infoBox);
             window.Controls.Add(scorebordButton);
             window.Controls.Add(moves);
+            window.Controls.Add(timerText);
         }
 
+        // Mayınları yerleştirme metod
         private void plantMines()
         {
-            Random random = new Random();
+            Random random = new Random(); // Rastgele sayı üreteci
 
-            mineField = new bool[gridSize, gridSize];
+            mineField = new bool[gridSize, gridSize]; // Mayın alanını oluştur
 
-            int placedMines = 0;
+            int placedMines = 0; // Yerleştirilen mayın sayısını takip et
 
+            // Mayınları rastgele yerleştir
             while (placedMines < mineCount)
             {
                 int randomX = random.Next(0, gridSize);
                 int randomY = random.Next(0, gridSize);
                 if (!mineField[randomX, randomY])
                 {
-                    mineField[randomX, randomY] = true;
-                    placedMines++;
+                    mineField[randomX, randomY] = true; // Mayın yerleştir
+                    placedMines++; // Yerleştirilen mayın sayısını artır
                 }
             }
         }
 
         private void createGrid()
         {
-            drawingPanel.Size = new Size(gridSize * 30, gridSize * 30);
+            // Oyun alanının boyutunu ayarla
+            drawingPanel.Size = new Size(gridSize * cellSize, gridSize * cellSize);
             drawingPanel.Location = new Point(0, 0);
-            window.Controls.Add(drawingPanel);
+            window.Controls.Add(drawingPanel); // Paneli pencereye ekle
 
+            // Grid için buton dizisini oluştur
             grid = new Button[gridSize, gridSize];
 
+            // Gridin her hücresine buton ekle
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
                 {
                     Button button = new Button
                     {
-                        Size = new Size(30, 30),
-                        Location = new Point(i * 30, j * 30),
-                        Tag = mineField[i, j] ? "MINE" : "SAFE",
+                        Size = new Size(cellSize, cellSize), // Buton boyutu
+                        Location = new Point(i * cellSize, j * cellSize), // Butonun konumu
+                        Tag = mineField[i, j] ? "MINE" : "SAFE", // Butonun etiketini belirle
 
-                        FlatStyle = FlatStyle.Flat,
-                        BackColor = ((i+j)%2 == 0) ? Color.FromArgb(157, 213, 57) : Color.FromArgb(130, 197, 42),
+                        FlatStyle = FlatStyle.Flat, // Buton stilini düz yap
+                        BackColor = ((i + j) % 2 == 0) ? Color.FromArgb(157, 213, 57) : Color.FromArgb(130, 197, 42), // Arka plan rengi
                     };
-                    button.MouseUp += OnCellClick;
-                    grid[i, j] = button;
-                    drawingPanel.Controls.Add(button);
+                    button.MouseUp += OnCellClick; // Butona tıklandığında çağrılacak olay
+                    grid[i, j] = button; // Butonu grid dizisine ekle
+                    drawingPanel.Controls.Add(button); // Butonu panelde göster
                 }
             }
-
         }
 
         private void OnCellClick(object sender, MouseEventArgs e)
         {
-            Button clickedButton = sender as Button;
+            Button clickedButton = sender as Button; // Tıklanan butonu al
 
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left) // Sol tıklama kontrolü
             {
-                if(clickedButton.Text != "🚩")
+                if (clickedButton.Text != "🚩") // Eğer buton işaretlenmemişse
                 {
-                    moveCount++;
-                    moves.Text = $"Hamle Sayısı: {moveCount}";
+                    moveCount++; // Hamle sayısını artır
+                    moves.Text = $"Hamle Sayısı: {moveCount}"; // Hamle sayısını güncelle
 
-                    checkCell(clickedButton);
+                    checkCell(clickedButton); // Butonun durumunu kontrol et
                 }
             }
-            else if (e.Button == MouseButtons.Right)
+            else if (e.Button == MouseButtons.Right) // Sağ tıklama kontrolü
             {
-                if((string)clickedButton.Tag != "OPENED")
+                if ((string)clickedButton.Tag != "OPENED") // Eğer hücre açılmamışsa
                 {
-                    if (clickedButton.Text != "🚩")
+                    if (clickedButton.Text != "🚩") // Eğer hücre işaretlenmemişse
                     {
-                        clickedButton.Text = "🚩";
+                        clickedButton.Text = "🚩"; // Hücreyi işaretle
                     }
                     else
                     {
-                        clickedButton.Text = "";
+                        clickedButton.Text = ""; // İşareti kaldır
                     }
                 }
             }
@@ -156,60 +236,230 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
 
         private void checkCell(Button cell)
         {
-            if((string)cell.Tag == "MINE")
+            if ((string)cell.Tag == "MINE") // Eğer hücre mayınsa
             {
-                cell.Text = "💣";
-                //Oyun bitirelecek.
-            } 
+                cell.Text = "💣"; // Mayın simgesini göster
+                StopTimer(); // Zamanlayıcıyı durdur
+
+                score = calculateScore(); // Skoru hesapla
+
+                RevealAllMines(); // Tüm mayınları göster
+
+                // Oyun sonu mesajı için yazı oluştur
+                Label endBox = new Label();
+                endBox.AutoSize = true;
+                endBox.Location = new Point((gridSize * cellSize) + 10, 180);
+                endBox.Name = "endText";
+                endBox.Size = new Size(245, 64);
+                endBox.TabIndex = 5;
+                endBox.Text = $"MAYINA BASTINIZ\r\nSkorunuz: {score}\r\n";
+                endBox.TextAlign = ContentAlignment.MiddleCenter;
+
+                // Yeni oyun butonu oluştur
+                Button newGameButton = new Button();
+                newGameButton.ForeColor = Color.Black;
+                newGameButton.Location = new Point((gridSize * cellSize) + 15, 240);
+                newGameButton.Name = "newGameButton";
+                newGameButton.Size = new Size(110, 30);
+                newGameButton.TabIndex = 2;
+                newGameButton.Text = "Yeni Oyun";
+                newGameButton.UseVisualStyleBackColor = true;
+                newGameButton.MouseUp += NewGameClick; // Butona tıklandığında yeni oyun başlat
+
+                // Sonuç mesajını ve yeni oyun butonunu pencereye ekle
+                window.Controls.Add(endBox);
+                window.Controls.Add(newGameButton);
+            }
             else
             {
-                checkNeighbors(cell);
-            }
-        }
+                openCell(cell); // Hücreyi aç
 
-        private void checkNeighbors(Button cell)
-        {
-            if((string)cell.Tag != "OPENED")
-            {
-                cell.Tag = "OPENED";
-                cell.Enabled = false;
-                cell.BackColor = ((cell.Location.X / 30 + cell.Location.Y / 30) % 2 == 0) ? Color.FromArgb(226, 187, 149) : Color.FromArgb(210, 176, 142);
+                int control = 0; // Açılmamış hücre sayısını takip et
 
-                int neighbors = 0;
-                int X_1 = (cell.Location.X / 30 - 1) < 0 ? 0 : (cell.Location.X / 30 - 1);
-                int X_2 = (cell.Location.X / 30 + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.X / 30 + 1);
-                int Y_1 = (cell.Location.Y / 30 - 1) < 0 ? 0 : (cell.Location.Y / 30 - 1);
-                int Y_2 = (cell.Location.Y / 30 + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.Y / 30 + 1);
-
-                for (int i = X_1; i <= X_2; i++)
+                // Tüm butonları kontrol et
+                foreach (var button in grid)
                 {
-                    for (int j = Y_1; j <= Y_2; j++)
+                    if ((string)button.Tag != "MINE" && (string)button.Tag != "OPENED") // Açılmamış ve mayın olmayan hücreleri say
                     {
-                        if ((string)grid[i, j].Tag == "MINE")
-                        {
-                            neighbors++;
-                        }
-                        else
-                        {
-                            checkNeighbors(grid[i, j]);
-                        }
+                        control++;
                     }
                 }
 
-                cell.Text = $"{neighbors}";
+                // Eğer açılmamış hücre yoksa oyunu kazan
+                if (control == 0)
+                {
+                    StopTimer(); // Zamanlayıcıyı durdur
+
+                    score = calculateScore(); // Skoru hesapla
+
+                    RevealAllMines(); // Tüm mayınları göster
+
+                    // Oyun kazanma mesajı için yazı oluştur
+                    Label endBox = new Label();
+                    endBox.AutoSize = true;
+                    endBox.Location = new Point((gridSize * cellSize) + 10, 180);
+                    endBox.Name = "endText";
+                    endBox.Size = new Size(245, 64);
+                    endBox.TabIndex = 5;
+                    endBox.Text = $"KAZANDINIZ\r\nSkorunuz: {score}\r\n";
+                    endBox.TextAlign = ContentAlignment.MiddleCenter;
+
+                    // Yeni oyun butonu oluştur
+                    Button newGameButton = new Button();
+                    newGameButton.ForeColor = Color.Black;
+                    newGameButton.Location = new Point((gridSize * cellSize) + 15, 240);
+                    newGameButton.Name = "newGameButton";
+                    newGameButton.Size = new Size(110, 30);
+                    newGameButton.TabIndex = 2;
+                    newGameButton.Text = "Yeni Oyun";
+                    newGameButton.UseVisualStyleBackColor = true;
+                    newGameButton.MouseUp += NewGameClick; // Butona tıklandığında yeni oyun başlat
+
+                    // Sonuç mesajını ve yeni oyun butonunu pencereye ekle
+                    window.Controls.Add(endBox);
+                    window.Controls.Add(newGameButton);
+                }
+            }
+        }
+
+        private void openCell(Button cell)
+        {
+            if ((string)cell.Tag != "OPENED") // Eğer hücre daha önce açılmamışsa
+            {
+                string mineCount = (string)cell.Tag; // Hücredeki mayın sayısını al
+
+                cell.Tag = "OPENED"; // Hücreyi açılmış olarak işaretle
+                cell.Enabled = false; // Butonu devre dışı bırak
+                cell.BackColor = ((cell.Location.X / cellSize + cell.Location.Y / cellSize) % 2 == 0) ? Color.FromArgb(226, 187, 149) : Color.FromArgb(210, 176, 142); // Arka plan rengini değiştir
+
+                if (mineCount != "0") // Eğer hücrede mayın yoksa
+                {
+                    cell.Text = mineCount; // Hücredeki mayın sayısını göster
+                }
+                else
+                {
+                    int[,] dizi = new int[4, 2]; // Komşu hücrelerin koordinatlarını saklamak için dizi
+
+                    // Komşu hücrelerin konumlarını ayarla
+                    dizi[0, 0] = cell.Location.X / cellSize;
+                    dizi[0, 1] = (cell.Location.Y / cellSize - 1) < 0 ? 0 : (cell.Location.Y / cellSize - 1);
+
+                    dizi[1, 0] = (cell.Location.X / cellSize - 1) < 0 ? 0 : (cell.Location.X / cellSize - 1);
+                    dizi[1, 1] = cell.Location.Y / cellSize;
+
+                    dizi[2, 0] = (cell.Location.X / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.X / cellSize + 1);
+                    dizi[2, 1] = cell.Location.Y / cellSize;
+
+                    dizi[3, 0] = cell.Location.X / cellSize;
+                    dizi[3, 1] = (cell.Location.Y / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.Y / cellSize + 1);
+
+                    // Komşu hücreleri aç
+                    for (int i = 0; i < 4; i++)
+                    {
+                        openCell(grid[dizi[i, 0], dizi[i, 1]]);
+                    }
+                }
+            }
+        }
+
+        private int checkNeighbors(Button cell)
+        {
+            int neighbors = 0;
+
+            // Komşu hücrelerin X ve Y koordinatlarını belirle
+            int X_1 = (cell.Location.X / cellSize - 1) < 0 ? 0 : (cell.Location.X / cellSize - 1);
+            int X_2 = (cell.Location.X / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.X / cellSize + 1);
+            int Y_1 = (cell.Location.Y / cellSize - 1) < 0 ? 0 : (cell.Location.Y / cellSize - 1);
+            int Y_2 = (cell.Location.Y / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.Y / cellSize + 1);
+
+            // Komşu hücreleri kontrol et ve mayın sayısını hesapla
+            for (int i = X_1; i <= X_2; i++)
+            {
+                for (int j = Y_1; j <= Y_2; j++)
+                {
+                    if ((string)grid[i, j].Tag == "MINE")
+                    {
+                        neighbors++;
+                    }
+                }
+            }
+
+            return neighbors; // Bulunan komşu mayın sayısını döndür
+        }
+
+        private void setMineCountForOneCell()
+        {
+            // Tüm hücreleri gezerek mayın sayısını ayarla
+            foreach (var button in grid)
+            {
+                if ((string)button.Tag != "MINE") // Eğer hücre mayın değilse
+                {
+                    button.Tag = $"{checkNeighbors(button)}"; // Komşu mayın sayısını ata
+                }
             }
         }
 
         private void RevealAllMines()
         {
+            // Tüm hücrelerdeki mayınları aç
             foreach (var button in grid)
             {
+                button.Enabled = false; // Tüm hücreleri devre dışı bırak
+
                 if ((string)button.Tag == "MINE")
                 {
-                    button.Text = "💣";
-                    button.BackColor = Color.Red;
+                    if (button.Text != "🚩")
+                    {
+                        button.Text = "💣"; // Mayın hücresini göster
+                    }
+
+                    button.BackColor = Color.Red; // Mayın hücresinin arka plan rengini kırmızı yap
                 }
             }
+        }
+
+        private void NewGameClick(object sender, MouseEventArgs e)
+        {
+            Button clickedButton = sender as Button;
+
+            // Yeni oyun butonuna tıklanırsa
+            if (e.Button == MouseButtons.Left)
+            {
+                window.InitializeStartScreen(); // Oyun giriş ekranını başlat
+            }
+        }
+
+        private int calculateScore()
+        {
+            int findMines = 0;
+
+            // Doğru bir şekilde işaretlenmiş mayınları say
+            foreach (var button in grid)
+            {
+                if (button.Text == "🚩" && (string)button.Tag == "MINE")
+                {
+                    findMines++;
+                }
+            }
+
+            // Skoru hesapla ve döndür
+            if (findMines == 0 || elapsedTime == 0)
+            {
+                return 0; // Eğer mayın bulunamadı veya süre sıfırsa, 0 döndür
+            }
+            else
+            {
+                int scr = (int)((findMines / (double)elapsedTime) * 1000); // Skoru hesapla
+                scoreboard.AddScore(userName, gridSize, mineCount, scr); // Skoru scoreboarda ekle
+
+                return scr; // Hesaplanan skoru döndür
+            }
+        }
+
+        private void ShowScoreboard()
+        {
+            ScoreboardWindow scoreboardWindow = new ScoreboardWindow(scoreboard); // Scoreboard penceresini oluştur
+            scoreboardWindow.Show(); // Scoreboard penceresini göster
         }
     }
 }
