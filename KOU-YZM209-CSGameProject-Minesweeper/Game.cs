@@ -37,9 +37,13 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
             this.scoreboard = scoreboard; // Skor tablosunu ayarla
 
             // Grid boyutuna göre hücre boyutunu ayarla
-            if (gridSize < 25)
+            if(gridSize < 10)
             {
-                cellSize = 30; // Küçük grid için hücre boyutu
+                cellSize = 50; // Küçük grid için hücre boyutu
+            }
+            else if (gridSize < 25)
+            {
+                cellSize = 30; // Orta grid için hücre boyutu
             }
             else
             {
