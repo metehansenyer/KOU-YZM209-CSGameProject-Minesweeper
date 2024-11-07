@@ -245,7 +245,8 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
                 cell.Text = "💣"; // Mayın simgesini göster
                 StopTimer(); // Zamanlayıcıyı durdur
 
-                score = calculateScore(); // Skoru hesapla
+                score = returnScore(); // Skoru hesapla
+                scoreboard.AddScore(userName, gridSize, mineCount, score);
 
                 RevealAllMines(); // Tüm mayınları göster
 
@@ -294,7 +295,8 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
                 {
                     StopTimer(); // Zamanlayıcıyı durdur
 
-                    score = calculateScore(); // Skoru hesapla
+                    score = returnScore(); // Skoru hesapla
+                    scoreboard.AddScore(userName, gridSize, mineCount, score);
 
                     RevealAllMines(); // Tüm mayınları göster
 
@@ -433,7 +435,7 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
             }
         }
 
-        private int calculateScore()
+        private int returnScore()
         {
             int findMines = 0;
 
@@ -446,18 +448,7 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
                 }
             }
 
-            // Skoru hesapla ve döndür
-            if (findMines == 0 || elapsedTime == 0)
-            {
-                return 0; // Eğer mayın bulunamadı veya süre sıfırsa, 0 döndür
-            }
-            else
-            {
-                int scr = (int)((findMines / (double)elapsedTime) * 1000); // Skoru hesapla
-                scoreboard.AddScore(userName, gridSize, mineCount, scr); // Skoru scoreboarda ekle
-
-                return scr; // Hesaplanan skoru döndür
-            }
+            return scoreboard.calculateScore(findMines, elapsedTime);
         }
 
         private void ShowScoreboard()

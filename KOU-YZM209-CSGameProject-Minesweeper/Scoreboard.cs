@@ -1,4 +1,6 @@
-﻿namespace KOU_YZM209_CSGameProject_Minesweeper
+﻿using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+
+namespace KOU_YZM209_CSGameProject_Minesweeper
 {
     public class Scoreboard
     {
@@ -26,6 +28,21 @@
         public Scoreboard()
         {
             scores = new List<ScoreEntry>(); // Skor listesini başlat
+        }
+
+        public int calculateScore(int findMines, int elapsedTime)
+        {
+            if (findMines == 0 || elapsedTime == 0)
+            {
+                return 0; // Eğer mayın bulunamadı veya süre sıfırsa, 0 döndür
+            }
+            else
+            {
+
+                int scr = (int)((findMines / (double)elapsedTime) * 1000); // Skoru hesapla
+
+                return scr; // Hesaplanan skoru döndür
+            }
         }
 
         // Yeni bir skor ekleme metodu
