@@ -19,7 +19,7 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
         private Scoreboard scoreboard; // Skor tablosu
 
         private Button[,] grid; // Oyun alanının kendisi
-        bool[,] mineField; // Mayın tutucu
+        private bool[,] mineField; // Mayın tutucu
         private Label moves = new Label(); // Hamle sayısını gösterecek yazı
         private Label timerText = new Label(); // Zamanı gösterecek yazı
         private Panel drawingPanel = new Panel(); // Oyun alanının çizileceği panel
@@ -246,7 +246,11 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
                 StopTimer(); // Zamanlayıcıyı durdur
 
                 score = returnScore(); // Skoru hesapla
-                scoreboard.AddScore(userName, gridSize, mineCount, score);
+                
+                if(score != 0)
+                {
+                    scoreboard.AddScore(userName, gridSize, mineCount, score);
+                }
 
                 RevealAllMines(); // Tüm mayınları göster
 
@@ -296,7 +300,11 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
                     StopTimer(); // Zamanlayıcıyı durdur
 
                     score = returnScore(); // Skoru hesapla
-                    scoreboard.AddScore(userName, gridSize, mineCount, score);
+
+                    if (score != 0)
+                    {
+                        scoreboard.AddScore(userName, gridSize, mineCount, score);
+                    }
 
                     RevealAllMines(); // Tüm mayınları göster
 
@@ -344,25 +352,19 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
                 }
                 else
                 {
-                    int[,] dizi = new int[4, 2]; // Komşu hücrelerin koordinatlarını saklamak için dizi
+                    // Komşu hücrelerin X ve Y koordinatlarını belirle
+                    int X_1 = (cell.Location.X / cellSize - 1) < 0 ? 0 : (cell.Location.X / cellSize - 1);
+                    int X_2 = (cell.Location.X / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.X / cellSize + 1);
+                    int Y_1 = (cell.Location.Y / cellSize - 1) < 0 ? 0 : (cell.Location.Y / cellSize - 1);
+                    int Y_2 = (cell.Location.Y / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.Y / cellSize + 1);
 
-                    // Komşu hücrelerin konumlarını ayarla
-                    dizi[0, 0] = cell.Location.X / cellSize;
-                    dizi[0, 1] = (cell.Location.Y / cellSize - 1) < 0 ? 0 : (cell.Location.Y / cellSize - 1);
-
-                    dizi[1, 0] = (cell.Location.X / cellSize - 1) < 0 ? 0 : (cell.Location.X / cellSize - 1);
-                    dizi[1, 1] = cell.Location.Y / cellSize;
-
-                    dizi[2, 0] = (cell.Location.X / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.X / cellSize + 1);
-                    dizi[2, 1] = cell.Location.Y / cellSize;
-
-                    dizi[3, 0] = cell.Location.X / cellSize;
-                    dizi[3, 1] = (cell.Location.Y / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.Y / cellSize + 1);
-
-                    // Komşu hücreleri aç
-                    for (int i = 0; i < 4; i++)
+                    // Komşu hücreleri kontrol et ve mayın sayısını hesapla
+                    for (int i = X_1; i <= X_2; i++)
                     {
-                        openCell(grid[dizi[i, 0], dizi[i, 1]]);
+                        for (int j = Y_1; j <= Y_2; j++)
+                        {
+                            openCell(grid[i, j]);
+                        }
                     }
                 }
             }
