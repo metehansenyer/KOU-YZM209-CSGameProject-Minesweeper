@@ -358,7 +358,7 @@ namespace KOU_YZM209_CSGameProject_Minesweeper
                     int Y_1 = (cell.Location.Y / cellSize - 1) < 0 ? 0 : (cell.Location.Y / cellSize - 1);
                     int Y_2 = (cell.Location.Y / cellSize + 1) > gridSize - 1 ? gridSize - 1 : (cell.Location.Y / cellSize + 1);
 
-                    // Komşu hücreleri kontrol et ve mayın sayısını hesapla
+                    // Komşu hücreleri kontrol et
                     for (int i = X_1; i <= X_2; i++)
                     {
                         for (int j = Y_1; j <= Y_2; j++)
